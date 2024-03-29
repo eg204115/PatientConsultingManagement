@@ -1,13 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { AiFillStar } from "react-icons/ai";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { BASE_URL, token } from "./../../config";
+import HashLoader from "react-spinners/HashLoader";
 
 const FeedbackForm = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { id } = useParams;
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (!rating || !reviewText) {
+        setLoading(false);
+        toast.error("Rating & Review Fields are required");
+      }
+      const res = await fetch(`${BASE_URL}/doctors/${id}/reviews`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating, reviewText }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message);
+      }
+
+      setLoading(false);
+      toast.success(result.message);
+    } catch (err) {
+      setLoading(false);
+      toast.error(err.message);
+    }
   };
 
   return (
@@ -55,13 +87,13 @@ const FeedbackForm = () => {
           className="border border-solid border-[#0066ff34] focus:outline outline-primaryColor 
         w-full px-4 py-3 rounded-md"
           placeholder="Write your message"
-          onChange={() => setReviewText(e.target.value)}
+          onChange={(e) => setReviewText(e.target.value)}
           rows="5"
         ></textarea>
       </div>
 
       <button type="submit" onClick={handleSubmitReview} className="btn">
-        Submit Feedback
+        {loading ? <HashLoader size={25} color="#fff" /> : "Submit Feedback"}
       </button>
     </form>
   );

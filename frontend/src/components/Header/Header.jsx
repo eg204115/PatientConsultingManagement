@@ -27,6 +27,7 @@ const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const { user, role, token } = useContext(authContext);
+  console.log(user);
 
   const handleStickyHeader = () => {
     window.addEventListener("scroll", () => {
@@ -55,7 +56,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* ####### logo #######  */}
           <div>
-            <img src={logo} alt="" />
+            <img src={logo} alt="" className="logo" />
           </div>
 
           {/* ####### menu ######## */}
